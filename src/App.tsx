@@ -13,6 +13,7 @@ export default function App() {
     openFile,
     reset,
     toggleSelected,
+    updateCaption,
   } = usePdfDocument();
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export default function App() {
                 key={page.pageNumber}
                 page={page}
                 onToggleSelected={toggleSelected}
+                onCaptionChange={updateCaption}
               />
             ))}
           </ul>

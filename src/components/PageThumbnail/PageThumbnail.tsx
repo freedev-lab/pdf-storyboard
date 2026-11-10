@@ -1,14 +1,17 @@
 import type { PdfPage } from "../../types/storyboard";
+import { CaptionEditor } from "../CaptionEditor/CaptionEditor";
 import "./PageThumbnail.css";
 
 interface PageThumbnailProps {
   page: PdfPage;
   onToggleSelected: (pageNumber: number) => void;
+  onCaptionChange: (pageNumber: number, caption: string) => void;
 }
 
 export function PageThumbnail({
   page,
   onToggleSelected,
+  onCaptionChange,
 }: PageThumbnailProps) {
   return (
     <li className={`thumb${page.selected ? "" : " thumb--off"}`}>
@@ -32,6 +35,11 @@ export function PageThumbnail({
           <div className="thumb__skeleton" aria-label="Rendering preview" />
         )}
       </div>
+
+      <CaptionEditor
+        value={page.caption}
+        onChange={(caption) => onCaptionChange(page.pageNumber, caption)}
+      />
     </li>
   );
 }

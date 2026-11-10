@@ -66,7 +66,7 @@ All PDF processing lives in `src/services` and `src/lib`, outside React componen
 - [x] PDF loader service (page count and page dimensions)
 - [x] Upload with drag & drop
 - [x] Page thumbnails
-- [ ] Text extraction
+- [x] Text extraction and automatic captions
 
 **Stage 2 — Storyboard editor** (planned)
 **Stage 3 — Preview and exports** (planned)

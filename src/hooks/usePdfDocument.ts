@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { disposePdf, loadPdf } from "../services/pdfLoader";
 import { renderPageToDataUrl } from "../services/pdfRenderer";
+import { captionFromText, extractPageText } from "../services/pdfTextExtractor";
 import type { LoadedPdf } from "../types/pdf";
 import type { PdfPage } from "../types/storyboard";
 
@@ -40,6 +41,7 @@ export function usePdfDocument() {
   });
 
   const loadedRef = useRef<LoadedPdf | null>(null);
+  /** Incremented on every new open/reset/unmount to cancel stale work. */
   const runIdRef = useRef(0);
 
   const reset = useCallback(() => {
@@ -69,6 +71,7 @@ export function usePdfDocument() {
       return;
     }
 
+    // Start a new run and cancel the previous one.
     const runId = runIdRef.current + 1;
     runIdRef.current = runId;
 
@@ -81,6 +84,7 @@ export function usePdfDocument() {
     try {
       const loaded = await loadPdf(file);
 
+      // A newer file was opened (or the hook unmounted) while loading.
       if (runId !== runIdRef.current) {
         void disposePdf(loaded);
         return;
@@ -90,6 +94,7 @@ export function usePdfDocument() {
       const pages = createPages(loaded);
       setState((current) => ({ ...current, pages }));
 
+      // Render sequentially: predictable memory, steady progress.
       for (const [index, page] of pages.entries()) {
         const thumbnail = await renderPageToDataUrl(
           loaded.document,
@@ -98,11 +103,25 @@ export function usePdfDocument() {
 
         if (runId !== runIdRef.current) return;
 
+        // Text extraction must never sink the whole document.
+        let caption = "";
+        try {
+          const text = await extractPageText(loaded.document, page.pageNumber);
+          caption = captionFromText(text);
+        } catch (error) {
+          console.warn(
+            `Could not extract text from page ${page.pageNumber}`,
+            error,
+          );
+        }
+
+        if (runId !== runIdRef.current) return;
+
         setState((current) => ({
           ...current,
           pages: current.pages.map((item) =>
             item.pageNumber === page.pageNumber
-              ? { ...item, thumbnail }
+              ? { ...item, thumbnail, caption: item.caption || caption }
               : item,
           ),
           progress: (index + 1) / pages.length,
@@ -140,6 +159,16 @@ export function usePdfDocument() {
     }));
   }, []);
 
+  const updateCaption = useCallback((pageNumber: number, caption: string) => {
+    setState((current) => ({
+      ...current,
+      pages: current.pages.map((page) =>
+        page.pageNumber === pageNumber ? { ...page, caption } : page,
+      ),
+    }));
+  }, []);
+
+  // Free the worker when the app unmounts.
   useEffect(() => {
     return () => {
       runIdRef.current += 1;
@@ -148,5 +177,5 @@ export function usePdfDocument() {
     };
   }, []);
 
-  return { ...state, openFile, reset, toggleSelected };
+  return { ...state, openFile, reset, toggleSelected, updateCaption };
 }
