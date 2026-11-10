@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Upload } from "./components/Upload/Upload";
 import { PageThumbnail } from "./components/PageThumbnail/PageThumbnail";
 import { usePdfDocument } from "./hooks/usePdfDocument";
+import { usePageSelection } from "./hooks/usePageSelection";
 
 export default function App() {
   const {
@@ -12,10 +13,21 @@ export default function App() {
     error,
     openFile,
     reset,
-    toggleSelected,
+    updatePages,
     updateCaption,
   } = usePdfDocument();
 
+  const {
+    selectedCount,
+    allSelected,
+    noneSelected,
+    toggleSelected,
+    selectAll,
+    clearSelection,
+    movePage,
+  } = usePageSelection(pages, updatePages);
+
+  // Stop the browser from navigating when a file is dropped outside the zone.
   useEffect(() => {
     function block(event: DragEvent) {
       event.preventDefault();
@@ -27,8 +39,6 @@ export default function App() {
       window.removeEventListener("drop", block);
     };
   }, []);
-
-  const selectedCount = pages.filter((page) => page.selected).length;
 
   return (
     <div className="app">
@@ -61,23 +71,45 @@ export default function App() {
               <strong>{file?.name}</strong> · {pages.length} pages ·{" "}
               {selectedCount} selected
             </p>
-            <button
-              type="button"
-              className="btn"
-              onClick={reset}
-              disabled={loading}
-            >
-              Close PDF
-            </button>
+
+            <div className="workspace__actions">
+              <button
+                type="button"
+                className="btn btn--small"
+                onClick={selectAll}
+                disabled={loading || allSelected}
+              >
+                Select all
+              </button>
+              <button
+                type="button"
+                className="btn btn--small"
+                onClick={clearSelection}
+                disabled={loading || noneSelected}
+              >
+                Clear selection
+              </button>
+              <button
+                type="button"
+                className="btn btn--small"
+                onClick={reset}
+                disabled={loading}
+              >
+                Close PDF
+              </button>
+            </div>
           </div>
 
           <ul className="thumb-grid">
-            {pages.map((page) => (
+            {pages.map((page, index) => (
               <PageThumbnail
                 key={page.pageNumber}
                 page={page}
+                position={index}
+                total={pages.length}
                 onToggleSelected={toggleSelected}
                 onCaptionChange={updateCaption}
+                onMove={movePage}
               />
             ))}
           </ul>

@@ -148,25 +148,23 @@ export function usePdfDocument() {
     }
   }, []);
 
-  const toggleSelected = useCallback((pageNumber: number) => {
-    setState((current) => ({
-      ...current,
-      pages: current.pages.map((page) =>
-        page.pageNumber === pageNumber
-          ? { ...page, selected: !page.selected }
-          : page,
-      ),
-    }));
-  }, []);
+  const updatePages = useCallback(
+    (updater: (pages: PdfPage[]) => PdfPage[]) => {
+      setState((current) => ({ ...current, pages: updater(current.pages) }));
+    },
+    [],
+  );
 
-  const updateCaption = useCallback((pageNumber: number, caption: string) => {
-    setState((current) => ({
-      ...current,
-      pages: current.pages.map((page) =>
-        page.pageNumber === pageNumber ? { ...page, caption } : page,
-      ),
-    }));
-  }, []);
+  const updateCaption = useCallback(
+    (pageNumber: number, caption: string) => {
+      updatePages((pages) =>
+        pages.map((page) =>
+          page.pageNumber === pageNumber ? { ...page, caption } : page,
+        ),
+      );
+    },
+    [updatePages],
+  );
 
   // Free the worker when the app unmounts.
   useEffect(() => {
@@ -177,5 +175,5 @@ export function usePdfDocument() {
     };
   }, []);
 
-  return { ...state, openFile, reset, toggleSelected, updateCaption };
+  return { ...state, openFile, reset, updatePages, updateCaption };
 }
