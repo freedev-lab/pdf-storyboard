@@ -1,83 +1,153 @@
+.upload {
+  position: relative;
+  margin-top: 18px;
+}
+
+/* Washi tape holding the upload card. */
+.upload::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: -13px;
+  left: 50%;
+  width: 108px;
+  height: 26px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(217, 180, 92, 0.38);
+  clip-path: polygon(2% 0, 98% 4%, 100% 50%, 97% 96%, 3% 100%, 0 52%);
+  box-shadow: 0 2px 5px rgba(74, 56, 37, 0.16);
+  pointer-events: none;
+}
+
 .upload__input {
   display: none;
 }
 
 .upload__dropzone {
+  position: relative;
   display: flex;
   width: 100%;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 40px 24px;
-  border: 2px dashed var(--border-strong);
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--muted);
+  gap: 8px;
+  padding: 44px 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px 18px 24px 16px;
+  background-color: var(--paper);
+  background-image: var(--grain),
+    linear-gradient(160deg, #fffdf7 0%, #fbf4e5 100%);
+  background-blend-mode: multiply, normal;
+  color: var(--ink-soft);
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  box-shadow: var(--shadow-paper);
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.upload__dropzone:hover,
+/* Stitched inner border, like a sewn paper card. */
+.upload__dropzone::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 2px dashed var(--line);
+  border-radius: 16px 12px 18px 10px;
+  pointer-events: none;
+}
+
+.upload__dropzone:hover:not(:disabled) {
+  transform: translateY(-2px) rotate(-0.2deg);
+  box-shadow: var(--shadow-lift);
+}
+
 .upload__dropzone:focus-visible {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  outline: none;
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
 }
 
 .upload__dropzone:disabled {
   cursor: progress;
+  opacity: 0.85;
 }
 
 .upload--dragging .upload__dropzone {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  transform: scale(1.005);
+  border-color: var(--terracotta);
+  background-image: var(--grain),
+    linear-gradient(160deg, #fff8ef 0%, #f7e8d3 100%);
+  transform: scale(1.008) rotate(0.3deg);
+  box-shadow: var(--shadow-lift);
 }
 
 .upload__icon {
-  color: var(--accent);
+  width: 62px;
+  height: 62px;
+  padding: 13px;
+  border-radius: 50%;
+  color: var(--terracotta);
+  background: #fffdf7;
+  box-shadow: 0 1px 0 #fff inset,
+    0 8px 16px -10px rgba(74, 56, 37, 0.5);
 }
 
 .upload__title {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.18rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .upload__hint {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 
 .upload__progress {
-  height: 6px;
-  margin-top: 12px;
+  height: 8px;
+  margin: 14px 4px 0;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--border);
+  background: #e7dbc4;
+  box-shadow: 0 1px 2px rgba(74, 56, 37, 0.12) inset;
 }
 
 .upload__progress span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  background: repeating-linear-gradient(
+    -45deg,
+    #b25b40 0 8px,
+    #a34a31 8px 16px
+  );
   transition: width 0.2s ease;
 }
 
 .upload__file,
 .upload__error {
-  margin: 10px 2px 0;
+  margin: 12px 2px 0;
   font-size: 0.875rem;
 }
 
 .upload__file {
-  color: var(--muted);
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink-soft);
   overflow-wrap: anywhere;
 }
 
 .upload__error {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px dashed rgba(160, 47, 37, 0.35);
+  border-radius: 10px 12px 9px 11px;
+  background: #f7e2da;
   color: var(--danger);
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload__dropzone,
+  .upload__progress span {
+    transition: none;
+  }
 }

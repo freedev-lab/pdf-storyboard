@@ -32,6 +32,11 @@ export default function App() {
   return (
     <div className="app">
       <header className="app__header">
+        <div className="app__deco" aria-hidden="true">
+          <span className="app__blob app__blob--a" />
+          <span className="app__blob app__blob--b" />
+          <span className="app__blob app__blob--c" />
+        </div>
         <p className="app__eyebrow">Local PDF tool</p>
         <h1 className="app__title">PDF Storyboard</h1>
         <p className="app__subtitle">

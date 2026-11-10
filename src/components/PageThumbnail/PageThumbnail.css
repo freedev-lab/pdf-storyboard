@@ -1,14 +1,38 @@
 .thumb {
+  position: relative;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  transition: opacity 0.15s, border-color 0.15s;
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 6px 6px;
+  background-color: var(--paper);
+  background-image: var(--grain),
+    linear-gradient(180deg, #fffdf7, #f9f1e0);
+  background-blend-mode: multiply, normal;
+  box-shadow: var(--shadow-paper);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+/* Slightly askew, like prints laid on a desk. */
+.thumb:nth-child(3n + 1) {
+  transform: rotate(-0.5deg);
+}
+
+.thumb:nth-child(3n + 2) {
+  transform: rotate(0.35deg);
+}
+
+.thumb:nth-child(3n) {
+  transform: rotate(-0.15deg);
+}
+
+.thumb:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: var(--shadow-lift);
 }
 
 .thumb--off {
-  opacity: 0.45;
+  opacity: 0.5;
+  filter: saturate(0.5);
 }
 
 .thumb__check {
@@ -16,9 +40,10 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
+  border-bottom: 1px dashed var(--line);
+  font-size: 0.82rem;
   font-weight: 600;
+  color: var(--ink);
   cursor: pointer;
   user-select: none;
 }
@@ -26,17 +51,18 @@
 .thumb__check input {
   width: 16px;
   height: 16px;
-  accent-color: var(--accent);
+  accent-color: var(--terracotta);
   cursor: pointer;
 }
 
 .thumb__frame {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   aspect-ratio: 3 / 4;
-  padding: 8px;
-  background: var(--surface-muted);
+  padding: 12px;
+  background: #f8f1e2;
 }
 
 .thumb__frame img {
@@ -44,16 +70,42 @@
   max-height: 100%;
   object-fit: contain;
   background: #fff;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 15%);
+  border: 1px solid rgba(74, 56, 37, 0.12);
+  box-shadow: 0 3px 8px rgba(74, 56, 37, 0.18);
+}
+
+/* Little strip of tape holding the print. */
+.thumb__frame::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 62px;
+  height: 16px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(217, 180, 92, 0.4);
+  clip-path: polygon(2% 0, 98% 3%, 100% 50%, 97% 100%, 3% 96%, 0 48%);
+  box-shadow: 0 1px 3px rgba(74, 56, 37, 0.15);
+  pointer-events: none;
+}
+
+.thumb:nth-child(even) .thumb__frame::after {
+  transform: translateX(-50%) rotate(2deg);
+  background: rgba(125, 143, 109, 0.35);
 }
 
 .thumb__skeleton {
   width: 100%;
   height: 100%;
-  border-radius: 6px;
-  background: linear-gradient(100deg, #f5f5f4 30%, #e7e5e4 50%, #f5f5f4 70%);
+  border-radius: 2px;
+  background: linear-gradient(
+    100deg,
+    #f4ecdc 30%,
+    #e9dcc4 50%,
+    #f4ecdc 70%
+  );
   background-size: 200% 100%;
-  animation: thumb-shimmer 1.2s linear infinite;
+  animation: thumb-shimmer 1.4s linear infinite;
 }
 
 @keyframes thumb-shimmer {
@@ -63,6 +115,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+
   .thumb__skeleton {
     animation: none;
   }
