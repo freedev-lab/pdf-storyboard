@@ -1,55 +1,81 @@
-import { useRef, useState } from "react";
-import { disposePdf, loadPdf } from "./services/pdfLoader";
-import type { LoadedPdf } from "./types/pdf";
+import { useEffect } from "react";
+import { Upload } from "./components/Upload/Upload";
+import { PageThumbnail } from "./components/PageThumbnail/PageThumbnail";
+import { usePdfDocument } from "./hooks/usePdfDocument";
 
 export default function App() {
-  const [pdf, setPdf] = useState<LoadedPdf | null>(null);
-  const [status, setStatus] = useState("No PDF loaded");
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    file,
+    pages,
+    loading,
+    progress,
+    error,
+    openFile,
+    reset,
+    toggleSelected,
+  } = usePdfDocument();
 
-  async function handleFile(file: File | undefined) {
-    if (!file) return;
-
-    setError(null);
-    setStatus(`Loading ${file.name}…`);
-
-    try {
-      await disposePdf(pdf);
-      const loaded = await loadPdf(file);
-      setPdf(loaded);
-      setStatus(`${loaded.source.name} — ${loaded.pages.length} page(s)`);
-    } catch (err) {
-      setPdf(null);
-      setStatus("Failed to load PDF");
-      setError(err instanceof Error ? err.message : String(err));
+  useEffect(() => {
+    function block(event: DragEvent) {
+      event.preventDefault();
     }
-  }
+    window.addEventListener("dragover", block);
+    window.addEventListener("drop", block);
+    return () => {
+      window.removeEventListener("dragover", block);
+      window.removeEventListener("drop", block);
+    };
+  }, []);
+
+  const selectedCount = pages.filter((page) => page.selected).length;
 
   return (
-    <main style={{ maxWidth: 720, margin: "48px auto", fontFamily: "system-ui" }}>
-      <h1>PDF Storyboard — Step 1 smoke test</h1>
+    <div className="app">
+      <header className="app__header">
+        <p className="app__eyebrow">Local PDF tool</p>
+        <h1 className="app__title">PDF Storyboard</h1>
+        <p className="app__subtitle">
+          Turn a PDF into a printable storyboard. Files are read locally in your
+          browser and never uploaded.
+        </p>
+      </header>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="application/pdf,.pdf"
-        onChange={(event) => handleFile(event.target.files?.[0])}
+      <Upload
+        onFileSelected={openFile}
+        loading={loading}
+        progress={progress}
+        fileName={file?.name}
+        error={error}
       />
 
-      <p>{status}</p>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {pages.length > 0 && (
+        <section className="workspace" aria-label="PDF pages">
+          <div className="workspace__bar">
+            <p>
+              <strong>{file?.name}</strong> · {pages.length} pages ·{" "}
+              {selectedCount} selected
+            </p>
+            <button
+              type="button"
+              className="btn"
+              onClick={reset}
+              disabled={loading}
+            >
+              Close PDF
+            </button>
+          </div>
 
-      {pdf && (
-        <ul>
-          {pdf.pages.map((page) => (
-            <li key={page.pageNumber}>
-              Page {page.pageNumber}: {page.width.toFixed(1)} ×{" "}
-              {page.height.toFixed(1)} pt
-            </li>
-          ))}
-        </ul>
+          <ul className="thumb-grid">
+            {pages.map((page) => (
+              <PageThumbnail
+                key={page.pageNumber}
+                page={page}
+                onToggleSelected={toggleSelected}
+              />
+            ))}
+          </ul>
+        </section>
       )}
-    </main>
+    </div>
   );
 }

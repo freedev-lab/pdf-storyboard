@@ -64,8 +64,8 @@ All PDF processing lives in `src/services` and `src/lib`, outside React componen
 - [x] Project scaffold, dependencies, and types
 - [x] PDF.js worker configured for Vite
 - [x] PDF loader service (page count and page dimensions)
-- [ ] Upload with drag & drop
-- [ ] Page thumbnails
+- [x] Upload with drag & drop
+- [x] Page thumbnails
 - [ ] Text extraction
 
 **Stage 2 — Storyboard editor** (planned)
