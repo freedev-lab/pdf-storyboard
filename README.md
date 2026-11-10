@@ -72,5 +72,9 @@ All PDF processing lives in `src/services` and `src/lib`, outside React componen
 
 - [x] Selection and page reordering
 
-**Stage 3 — Preview and exports** (planned)
+**Stage 3 — Preview and exports (in progress)**
+
+- [x] Storyboard settings (layout, paper, grid, labels, accent)
+- [x] Live multi-sheet storyboard preview
+
 **Stage 4 — OCR and polish** (planned)

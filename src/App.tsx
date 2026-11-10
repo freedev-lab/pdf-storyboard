@@ -1,8 +1,11 @@
 import { useEffect } from "react";
 import { Upload } from "./components/Upload/Upload";
 import { PageThumbnail } from "./components/PageThumbnail/PageThumbnail";
+import { StoryboardSettingsPanel } from "./components/StoryboardSettings/StoryboardSettings";
+import { StoryboardPreview } from "./components/StoryboardPreview/StoryboardPreview";
 import { usePdfDocument } from "./hooks/usePdfDocument";
 import { usePageSelection } from "./hooks/usePageSelection";
+import { useStoryboardSettings } from "./hooks/useStoryboardSettings";
 
 export default function App() {
   const {
@@ -26,6 +29,10 @@ export default function App() {
     clearSelection,
     movePage,
   } = usePageSelection(pages, updatePages);
+
+  const { settings, updateSettings, resetSettings } = useStoryboardSettings();
+
+  const selectedPages = pages.filter((page) => page.selected);
 
   // Stop the browser from navigating when a file is dropped outside the zone.
   useEffect(() => {
@@ -65,55 +72,66 @@ export default function App() {
       />
 
       {pages.length > 0 && (
-        <section className="workspace" aria-label="PDF pages">
-          <div className="workspace__bar">
-            <p>
-              <strong>{file?.name}</strong> · {pages.length} pages ·{" "}
-              {selectedCount} selected
-            </p>
+        <>
+          <section className="workspace" aria-label="PDF pages">
+            <div className="workspace__bar">
+              <p>
+                <strong>{file?.name}</strong> · {pages.length} pages ·{" "}
+                {selectedCount} selected
+              </p>
 
-            <div className="workspace__actions">
-              <button
-                type="button"
-                className="btn btn--small"
-                onClick={selectAll}
-                disabled={loading || allSelected}
-              >
-                Select all
-              </button>
-              <button
-                type="button"
-                className="btn btn--small"
-                onClick={clearSelection}
-                disabled={loading || noneSelected}
-              >
-                Clear selection
-              </button>
-              <button
-                type="button"
-                className="btn btn--small"
-                onClick={reset}
-                disabled={loading}
-              >
-                Close PDF
-              </button>
+              <div className="workspace__actions">
+                <button
+                  type="button"
+                  className="btn btn--small"
+                  onClick={selectAll}
+                  disabled={loading || allSelected}
+                >
+                  Select all
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--small"
+                  onClick={clearSelection}
+                  disabled={loading || noneSelected}
+                >
+                  Clear selection
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--small"
+                  onClick={reset}
+                  disabled={loading}
+                >
+                  Close PDF
+                </button>
+              </div>
             </div>
-          </div>
 
-          <ul className="thumb-grid">
-            {pages.map((page, index) => (
-              <PageThumbnail
-                key={page.pageNumber}
-                page={page}
-                position={index}
-                total={pages.length}
-                onToggleSelected={toggleSelected}
-                onCaptionChange={updateCaption}
-                onMove={movePage}
-              />
-            ))}
-          </ul>
-        </section>
+            <ul className="thumb-grid">
+              {pages.map((page, index) => (
+                <PageThumbnail
+                  key={page.pageNumber}
+                  page={page}
+                  position={index}
+                  total={pages.length}
+                  onToggleSelected={toggleSelected}
+                  onCaptionChange={updateCaption}
+                  onMove={movePage}
+                />
+              ))}
+            </ul>
+          </section>
+
+          <StoryboardSettingsPanel
+            settings={settings}
+            selectedCount={selectedCount}
+            onChange={updateSettings}
+            onReset={resetSettings}
+          />
+
+          <StoryboardPreview pages={selectedPages} settings={settings} />
+        </>
       )}
     </div>
   );
