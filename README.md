@@ -76,5 +76,6 @@ All PDF processing lives in `src/services` and `src/lib`, outside React componen
 
 - [x] Storyboard settings (layout, paper, grid, labels, accent)
 - [x] Live multi-sheet storyboard preview
+- [x] PDF storyboard export
 
 **Stage 4 — OCR and polish** (planned)

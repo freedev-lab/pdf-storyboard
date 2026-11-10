@@ -3,6 +3,7 @@ import { Upload } from "./components/Upload/Upload";
 import { PageThumbnail } from "./components/PageThumbnail/PageThumbnail";
 import { StoryboardSettingsPanel } from "./components/StoryboardSettings/StoryboardSettings";
 import { StoryboardPreview } from "./components/StoryboardPreview/StoryboardPreview";
+import { ExportControls } from "./components/ExportControls/ExportControls";
 import { usePdfDocument } from "./hooks/usePdfDocument";
 import { usePageSelection } from "./hooks/usePageSelection";
 import { useStoryboardSettings } from "./hooks/useStoryboardSettings";
@@ -131,6 +132,13 @@ export default function App() {
           />
 
           <StoryboardPreview pages={selectedPages} settings={settings} />
+
+          <ExportControls
+            pages={selectedPages}
+            settings={settings}
+            fileName={file?.name}
+            disabled={loading}
+          />
         </>
       )}
     </div>
